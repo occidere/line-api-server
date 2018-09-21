@@ -1,5 +1,6 @@
 buildscript {
     ext {
+        buildVersion = "0.0.1"
         springBootVersion = '2.0.5.RELEASE'
     }
     repositories {
@@ -19,10 +20,24 @@ group = 'org.occidere'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
+jar {
+    baseName = "line-api-server"
+    version = "${buildVersion}"
+    manifest {
+        attributes 'Titile': 'Line Api Server',
+                'Version': 1.0,
+                'Main-Class': 'org.occidere.lineapiserver.LineApiServerApplication'
+    }
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
