@@ -1,4 +1,4 @@
 line.bot:
-  channel-token: 'ViX/vKc85MIa/dHQh3YMgio/i2dBTVgH4QZtat9mVKdODYF7oO+KHZ5OXiWWQEqABHrffURTVj6MMgFqTuGItzUl+rpjirThx4lnheS/Fs5QAybG4WQ5klOdCcSnyYzJDlxsqMP2wVpijxGE33q+TAdB04t89/1O/w1cDnyilFU='
-  channel-secret: '30515df54bb6cddf1f347adfa203594c'
+  channel-token: ''
+  channel-secret: ''
   handler.path: /callback
