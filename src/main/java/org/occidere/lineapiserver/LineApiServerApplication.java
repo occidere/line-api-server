@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
 @Slf4j
@@ -31,7 +30,7 @@ public class LineApiServerApplication {
 	private LineMessagingClient lineMessagingClient;
 
 	@EventMapping
-	public Message handleImageRequestEvent(MessageEvent<TextMessageContent> event) throws Exception {
+	public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
 		String replyToken = event.getReplyToken();
 		String jsonMsg = event.getMessage().getText();
 
@@ -47,14 +46,13 @@ public class LineApiServerApplication {
 
 		message = new ImageMessage(url, url);
 		replyMessage = new ReplyMessage(replyToken, message);
-		BotApiResponse response;
-
-		response = lineMessagingClient.replyMessage(replyMessage).get();
+		BotApiResponse response = lineMessagingClient
+				.replyMessage(replyMessage)
+				.get();
 		log.info("Response : " + response);
 
 		return new TextMessage(title);
 	}
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(LineApiServerApplication.class, args);
