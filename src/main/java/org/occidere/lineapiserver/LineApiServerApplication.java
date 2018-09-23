@@ -73,8 +73,8 @@ public class LineApiServerApplication {
 
 		String fileName = "img/" + UUID.randomUUID().toString() + ".jpg";
 		try {
+			log.info("File Name : " + fileName);
 			FileUtils.copyURLToFile(new URL(testImageUrl), new File(fileName));
-			System.out.println(fileName);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
