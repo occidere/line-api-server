@@ -71,9 +71,15 @@ public class LineApiServerApplication {
 
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
-		imageContentSendTest(replyToken, messageId, responseBody -> {
-			reply(replyToken, new ImageMessage(testImageUrl, testImageUrl));
-		});
+		try {
+			ImageMessage imageMessage = new ImageMessage(testImageUrl, testImageUrl);
+			ReplyMessage replyMessage = new ReplyMessage(replyToken, imageMessage);
+
+			BotApiResponse response = lineMessagingClient.replyMessage(replyMessage).get();
+			log.info("Response : " + response);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@EventMapping
