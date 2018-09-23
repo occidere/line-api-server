@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 @RestController
 public class LineApiServerApplication {
 
-	private static String testImageUrl = "https://www.allkpop.com/upload/2018/08/af_org/01065517/oh-my-girl.jpg";
+	private static String testImageUrl = "https://klyrics.net/wp-content/uploads/2018/01/Oh-My-Girl-Secret-Garden.jpg";
 
 	@Autowired
 	private LineMessagingClient lineMessagingClient;
