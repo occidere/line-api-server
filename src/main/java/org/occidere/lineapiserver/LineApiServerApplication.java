@@ -39,6 +39,8 @@ public class LineApiServerApplication {
 		String title = jsonMap.get("title");
 		String url = jsonMap.get("url");
 
+		log.info("title: {}", title);
+		log.info("url: {}", url);
 		log.info("event: {}", event);
 
 		Message message;
