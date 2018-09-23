@@ -46,12 +46,12 @@ public class LineApiServerApplication {
 		Message message;
 		ReplyMessage replyMessage;
 
-		message = new ImageMessage(url, url);
-		replyMessage = new ReplyMessage(replyToken, message);
-		BotApiResponse response = lineMessagingClient
-				.replyMessage(replyMessage)
-				.get();
-		log.info("Response : " + response);
+//		message = new ImageMessage(url, url);
+//		replyMessage = new ReplyMessage(replyToken, message);
+//		BotApiResponse response = lineMessagingClient
+//				.replyMessage(replyMessage)
+//				.get();
+//		log.info("Response : " + response);
 
 		return new TextMessage(title);
 	}
