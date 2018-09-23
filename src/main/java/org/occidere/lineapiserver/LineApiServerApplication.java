@@ -72,15 +72,9 @@ public class LineApiServerApplication {
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
 		imageContentSendTest(replyToken, messageId, responseBody -> {
-			String fileName = "img/" + UUID.randomUUID().toString() + ".jpg";
-			try {
-				log.info("File Name : " + fileName);
-				FileUtils.copyURLToFile(new URL(testImageUrl), new File(fileName));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-			reply(replyToken, new ImageMessage(fileName, fileName));
+			DownloadedContent jpg = saveContent("jpg", responseBody);
+			DownloadedContent previewImg = createTempFile("jpg");
+			reply(event.getReplyToken(), new ImageMessage(jpg.getUri(), jpg.getUri()));
 		});
 	}
 
