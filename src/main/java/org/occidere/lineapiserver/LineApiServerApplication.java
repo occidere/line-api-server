@@ -1,20 +1,24 @@
 package org.occidere.lineapiserver;
 
-import com.linecorp.bot.model.event.Event;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.event.source.Source;
+import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootApplication
 @Slf4j
@@ -22,33 +26,35 @@ import java.time.format.DateTimeFormatter;
 @RestController
 public class LineApiServerApplication {
 
+	@Autowired
+	private LineMessagingClient lineMessagingClient;
+
 	@EventMapping
-	public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
+	public Message handleImageRequestEvent(MessageEvent<TextMessageContent> event) throws Exception {
 		String replyToken = event.getReplyToken();
-		TextMessageContent textMessageContent = event.getMessage();
-		String originMsgText = event.getMessage().getText();
+		String jsonMsg = event.getMessage().getText();
 
-		Source source = event.getSource();
-		String senderId = source.getSenderId();
-		String userId = source.getUserId();
+		Map<String, String> jsonMap = new ObjectMapper().readValue(jsonMsg, HashMap.class);
 
-		System.out.println(event);
-		System.out.println("replyToken: " + replyToken);
-		System.out.println("textMessageContent: " + textMessageContent);
-		System.out.println("text: " + originMsgText);
-		System.out.println("senderId: " + senderId);
-		System.out.println("userId: " + userId);
+		String title = jsonMap.get("title");
+		String url = jsonMap.get("url");
 
-		String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+		log.info("title: {}", title);
+		log.info("url: {}", url);
+		log.info("event: {}", event);
 
-		return new TextMessage(date + " - " + originMsgText);
+		Message message;
+		ReplyMessage replyMessage;
+
+//		message = new ImageMessage(url, url);
+//		replyMessage = new ReplyMessage(replyToken, message);
+//		BotApiResponse response = lineMessagingClient
+//				.replyMessage(replyMessage)
+//				.get();
+//		log.info("Response : " + response);
+
+		return new TextMessage(title);
 	}
-
-	@EventMapping
-	public void handleDefaultMessageEvent(Event event) {
-		System.out.println("event: " + event);
-	}
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(LineApiServerApplication.class, args);
