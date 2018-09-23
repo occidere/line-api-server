@@ -41,15 +41,19 @@ import java.util.function.Consumer;
 @RestController
 public class LineApiServerApplication {
 
+	private static String testImageUrl = "https://www.allkpop.com/upload/2018/08/af_org/01065517/oh-my-girl.jpg";
+
 	@Autowired
 	private LineMessagingClient lineMessagingClient;
 	private static Path downloadedContentDir;
 
 	@EventMapping
-	public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
+//	public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
+	public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
 		String replyToken = event.getReplyToken();
 		TextMessageContent textMessageContent = event.getMessage();
 		String originMsgText = event.getMessage().getText();
+		String messageId = event.getMessage().getId();
 
 		Source source = event.getSource();
 		String senderId = source.getSenderId();
@@ -62,8 +66,9 @@ public class LineApiServerApplication {
 		log.info("senderId: " + senderId);
 		log.info("userId: " + userId);
 
+//		return new TextMessage(getDate() + " - " + originMsgText);
 
-		return new TextMessage(getDate() + " - " + originMsgText);
+		imageContentSendTest(replyToken, messageId, x -> reply(replyToken, new ImageMessage(testImageUrl, testImageUrl)));
 	}
 
 	@EventMapping
@@ -90,6 +95,17 @@ public class LineApiServerApplication {
 	}
 
 	private void handleHeavyContent(String replyToken, String messageId, Consumer<MessageContentResponse> messageConsumer) {
+		MessageContentResponse response;
+		try {
+			response = lineMessagingClient.getMessageContent(messageId).get();
+		} catch (Exception e) {
+			reply(replyToken, new TextMessage("Can't get image: " + e.getMessage()));
+			throw new RuntimeException(e);
+		}
+		messageConsumer.accept(response);
+	}
+
+	private void imageContentSendTest(String replyToken, String messageId, Consumer<MessageContentResponse> messageConsumer) {
 		MessageContentResponse response;
 		try {
 			response = lineMessagingClient.getMessageContent(messageId).get();
