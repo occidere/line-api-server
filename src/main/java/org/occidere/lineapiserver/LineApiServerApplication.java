@@ -14,17 +14,22 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -68,7 +73,13 @@ public class LineApiServerApplication {
 
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
-		imageContentSendTest(replyToken, messageId, x -> reply(replyToken, new ImageMessage(testImageUrl, testImageUrl)));
+		File imgFile = new File("img/" + UUID.randomUUID().toString());
+		try {
+			FileUtils.copyURLToFile(new URL(testImageUrl), imgFile);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		imageContentSendTest(replyToken, messageId, x -> reply(replyToken, new ImageMessage(imgFile.getAbsolutePath(), imgFile.getAbsolutePath())));
 	}
 
 	@EventMapping
