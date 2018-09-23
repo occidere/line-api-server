@@ -71,13 +71,13 @@ public class LineApiServerApplication {
 
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
-		File imgFile = new File("img/" + UUID.randomUUID().toString());
+		String fileName = "img/" + UUID.randomUUID().toString();
 		try {
-			FileUtils.copyURLToFile(new URL(testImageUrl), imgFile);
+			FileUtils.copyURLToFile(new URL(testImageUrl), new File(fileName));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		imageContentSendTest(replyToken, messageId, x -> reply(replyToken, new ImageMessage(imgFile.getAbsolutePath(), imgFile.getAbsolutePath())));
+		imageContentSendTest(replyToken, messageId, x -> reply(replyToken, new ImageMessage(fileName, fileName)));
 	}
 
 	@EventMapping
