@@ -72,7 +72,7 @@ public class LineApiServerApplication {
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
 		try {
-			ImageMessage imageMessage = new ImageMessage(testImageUrl, testImageUrl);
+			ImageMessage imageMessage = new ImageMessage(originMsgText, originMsgText);
 			ReplyMessage replyMessage = new ReplyMessage(replyToken, imageMessage);
 
 			BotApiResponse response = lineMessagingClient.replyMessage(replyMessage).get();
