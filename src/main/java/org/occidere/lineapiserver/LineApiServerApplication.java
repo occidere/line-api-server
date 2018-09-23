@@ -72,9 +72,7 @@ public class LineApiServerApplication {
 //		return new TextMessage(getDate() + " - " + originMsgText);
 
 		imageContentSendTest(replyToken, messageId, responseBody -> {
-			DownloadedContent jpg = saveContent("jpg", responseBody);
-			DownloadedContent previewImg = createTempFile("jpg");
-			reply(event.getReplyToken(), new ImageMessage(jpg.getUri(), jpg.getUri()));
+			reply(replyToken, new ImageMessage(testImageUrl, testImageUrl));
 		});
 	}
 
