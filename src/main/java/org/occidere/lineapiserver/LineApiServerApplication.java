@@ -2,6 +2,7 @@ package org.occidere.lineapiserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -15,9 +16,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
@@ -34,10 +47,12 @@ public class LineApiServerApplication {
 		String replyToken = event.getReplyToken();
 		String jsonMsg = event.getMessage().getText();
 
-		Map<String, String> jsonMap = new ObjectMapper().readValue(jsonMsg, HashMap.class);
+		LinkedHashMap<String, String> titleImageMap = new ObjectMapper().readValue(jsonMsg, LinkedHashMap.class);
 
-		String title = jsonMap.get("title");
-		String url = jsonMap.get("url");
+		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
+
+		String title = entry.getKey();
+		String url = entry.getValue();
 
 		log.info("title: {}", title);
 		log.info("url: {}", url);
@@ -54,6 +69,37 @@ public class LineApiServerApplication {
 //		log.info("Response : " + response);
 
 		return new TextMessage(title);
+	}
+
+	private void pushImage(LinkedHashMap<String, String> titleImageMap) throws Exception {
+		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
+
+		String title = entry.getKey();
+		String url = entry.getValue();
+		String to = "U6f1932eaf6267ca62d11f797a22db6d4";
+
+		log.info("title: {}", title);
+		log.info("url: {}", url);
+
+		Message message = new ImageMessage(url, url);
+		PushMessage pushMessage = new PushMessage(to, message);
+
+		BotApiResponse response = lineMessagingClient
+				.pushMessage(pushMessage)
+				.get();
+
+		log.info("{}", response.toString());
+	}
+
+	@RequestMapping(value = "/push/image", method = RequestMethod.POST)
+	public String pushImageEvent(@RequestBody List<LinkedHashMap<String, String>> body) throws Exception {
+		log.info("body: {}", body);
+
+		for(LinkedHashMap<String, String> titleImageMap : body) {
+			pushImage(titleImageMap);
+		}
+
+		return "done";
 	}
 
 	public static void main(String[] args) {
