@@ -39,9 +39,13 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile group: 'com.linecorp.bot', name: 'line-bot-spring-boot', version: '2.0.0'
-    compileOnly('org.projectlombok:lombok')
+    compile('org.projectlombok:lombok')
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
