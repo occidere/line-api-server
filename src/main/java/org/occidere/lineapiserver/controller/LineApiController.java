@@ -49,7 +49,7 @@ public class LineApiController {
 			List<LinkedHashMap<String, String>> titleImageList = requestTitleImageList(range);
 
 			for (LinkedHashMap<String, String> titleImageMap : titleImageList) {
-				replyImage(replyToken, titleImageMap);
+				pushImage(titleImageMap);
 			}
 
 			return new TextMessage("Done!");
