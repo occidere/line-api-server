@@ -35,23 +35,25 @@ public class LineApiController {
 	@Value("${line.bot.id}")
 	private String dailyOmgId;
 
+	@Value("${dailyomg.url}")
+	private String dailyOmgUrl;
+
 	@EventMapping
 	public Message handleRequestImageEvent(MessageEvent<TextMessageContent> event) {
 		String replyToken = event.getReplyToken();
 		String text = event.getMessage().getText();
 
+		log.info("replyToken: {}", replyToken);
 		log.info("text: {}", text);
 
 		try {
-			if (StringUtils.isNumeric(text) == false) {
-				throw new RuntimeException("Not Numeric: " + text);
-			}
-
-			int range = Integer.parseInt(text);
+			int range = checkAndGetRange(text); // 잘못된 형식이면 IllegalArgumentException 발생
 			List<LinkedHashMap<String, String>> titleImageList = requestTitleImageList(range);
 
+			log.info("list size: {}", titleImageList.size());
+
 			for (LinkedHashMap<String, String> titleImageMap : titleImageList) {
-				pushImage(titleImageMap);
+				replyImage(replyToken, titleImageMap); // 요청한 사람에게만 리플라이
 			}
 
 			return new TextMessage("Done!");
@@ -61,8 +63,7 @@ public class LineApiController {
 	}
 
 	private List<LinkedHashMap<String, String>> requestTitleImageList(int range) {
-		RestTemplate restTemplate = new RestTemplate();
-		return restTemplate.getForObject("http://49.236.134.11:8080/request/ohmygirl/image?range=" + range, List.class);
+		return new RestTemplate().getForObject(dailyOmgUrl + "/request/ohmygirl/image?range=" + range, List.class);
 	}
 
 	/**
@@ -77,7 +78,7 @@ public class LineApiController {
 		log.info("body: {}", body);
 
 		for (LinkedHashMap<String, String> titleImageMap : body) {
-			pushImage(titleImageMap);
+			pushImage(titleImageMap); // 전체 구독자 대상 푸시
 		}
 
 		return "done";
@@ -119,6 +120,25 @@ public class LineApiController {
 				.get();
 
 		log.info("{}", response.toString());
+	}
+
+	private int checkAndGetRange(String text) throws IllegalArgumentException {
+		text = StringUtils.trim(text);
+
+		if(StringUtils.isBlank(text)) {
+			throw new IllegalArgumentException("Blank Text!");
+		}
+
+		if(StringUtils.isNumeric(text) == false) {
+			throw new IllegalArgumentException("Not Numeric!");
+		}
+
+		int range = Integer.parseInt(text);
+		if(range < 0 || range > 3) {
+			throw new IllegalArgumentException("Out of range! please input 0 ~ 3 value!");
+		}
+
+		return range;
 	}
 
 }
