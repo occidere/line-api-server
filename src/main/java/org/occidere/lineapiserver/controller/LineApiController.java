@@ -84,6 +84,15 @@ public class LineApiController {
 		return "done";
 	}
 
+	/********** healt **********/
+	@RequestMapping(value = "/health", method = RequestMethod.GET)
+	public long healthCheck() {
+		log.info("Health Check!");
+		return System.currentTimeMillis();
+	}
+
+
+
 	private void pushImage(LinkedHashMap<String, String> titleImageMap) throws Exception {
 		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
 
