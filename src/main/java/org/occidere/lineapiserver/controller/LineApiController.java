@@ -94,13 +94,9 @@ public class LineApiController {
 
 
 	private void pushImage(LinkedHashMap<String, String> titleImageMap) throws Exception {
-		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
-
-		String title = entry.getKey();
-		String url = entry.getValue();
-
-		log.info("title: {}", title);
-		log.info("url: {}", url);
+		String titleImageArr[] = parseTitleImageMap(titleImageMap);
+		String title = titleImageArr[0];
+		String url = titleImageArr[1];
 
 		Message message = new ImageMessage(url, url);
 		PushMessage pushMessage = new PushMessage(dailyOmgId, message);
@@ -113,13 +109,9 @@ public class LineApiController {
 	}
 
 	private void replyImage(String reployToken, LinkedHashMap<String, String> titleImageMap) throws Exception {
-		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
-
-		String title = entry.getKey();
-		String url = entry.getValue();
-
-		log.info("title: {}", title);
-		log.info("url: {}", url);
+		String titleImageArr[] = parseTitleImageMap(titleImageMap);
+		String title = titleImageArr[0];
+		String url = titleImageArr[1];
 
 		Message message = new ImageMessage(url, url);
 		ReplyMessage replyMessage = new ReplyMessage(reployToken, message);
@@ -130,6 +122,30 @@ public class LineApiController {
 
 		log.info("{}", response.toString());
 	}
+
+	/**
+	 * titleImageMap에서 title과 url을 추출하여 배열에 담아 반환.
+	 * 이미지 url이 http 인 경우 line api 전송시 에러가 발생하기에 강제로 https로 변경하여 반환한다.
+	 * @param titleImageMap title과 url 이 담긴 LinkedHashMap 객체
+	 * @return arr[0] = title, arr[1] = url
+	 */
+	private String[] parseTitleImageMap(LinkedHashMap<String, String> titleImageMap) {
+		Map.Entry<String, String> entry = titleImageMap.entrySet().iterator().next();
+
+		String title = entry.getKey();
+		String url = entry.getValue();
+
+		log.info("title: {}", title);
+		log.info("url: {}", url);
+
+		if(StringUtils.startsWith(url, "http://")) {
+			url = StringUtils.replace(url, "http://", "https://");
+			log.warn("Force change http -> https");
+		}
+
+		return new String[] { title, url };
+	}
+
 
 	private int checkAndGetRange(String text) throws IllegalArgumentException {
 		text = StringUtils.trim(text);
