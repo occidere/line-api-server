@@ -84,14 +84,44 @@ public class LineApiController {
 		return "done";
 	}
 
+	/**
+	 * DailyOMG 에서 스케쥴 등 텍스트 전송 시 호출하는 주소
+	 *
+	 * @param body
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/push/text", method = RequestMethod.POST)
+	public String pushTextEvent(@RequestBody List<LinkedHashMap<String, String>> body) throws Exception {
+		log.info("body: {}", body);
+
+		StringBuilder text = new StringBuilder();
+		String date = "";
+		for (LinkedHashMap<String, String> dateScheduleMap : body) {
+			Map.Entry<String, String> dateScheduleEntry = dateScheduleMap.entrySet().iterator().next();
+
+			String tmpDate = dateScheduleEntry.getKey();
+			String schedule = dateScheduleEntry.getValue();
+
+			if(StringUtils.equals(date, tmpDate) == false) {
+				date = tmpDate;
+				text.append("[").append(date).append("]\n");
+			}
+
+			text.append(schedule).append("\n");
+
+		}
+		pushText(text.toString()); // 전체 구독자 대상 푸시
+
+		return text.toString();
+	}
+
 	/********** healt **********/
 	@RequestMapping(value = "/health", method = RequestMethod.GET)
 	public long healthCheck() {
 		log.info("Health Check!");
 		return System.currentTimeMillis();
 	}
-
-
 
 	private void pushImage(LinkedHashMap<String, String> titleImageMap) throws Exception {
 		String titleImageArr[] = parseTitleImageMap(titleImageMap);
@@ -118,6 +148,17 @@ public class LineApiController {
 
 		BotApiResponse response = lineMessagingClient
 				.replyMessage(replyMessage)
+				.get();
+
+		log.info("{}", response.toString());
+	}
+
+	private void pushText(String text) throws Exception {
+		Message message = new TextMessage(text);
+		PushMessage pushMessage = new PushMessage(dailyOmgId, message);
+
+		BotApiResponse response = lineMessagingClient
+				.pushMessage(pushMessage)
 				.get();
 
 		log.info("{}", response.toString());
